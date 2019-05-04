@@ -1,0 +1,218 @@
+#!/bin/bash
+#IP="127.0.0.1"
+IP="192.168.0.44"
+let PORTID=1233
+let PORT=1234
+let PORT2=1235
+let PORT_RECV=1236
+let PORT_SEND=1237
+
+id_sh="id.sh"
+msg_to_send=""
+filename="recv.txt"
+IP_temp="cl_ip.txt"
+IP_allowed="ip_allowed.txt"
+HOSTS="hosts.txt"
+recv="recv_all.txt"
+let "JUST_ONE=0"
+
+function clean() # On nettoie les fichiers temporaire à chaque redemarrages
+{
+	rm $IP_allowed
+	rm $HOSTS
+	rm $filename
+	rm $IP_temp
+	rm $recv
+}
+
+function ID()
+{
+	local user=""
+	local ID_done=""
+	local IP=""
+	while [ 1 -eq 1 ];do
+
+		ncat -l -p $PORT --recv-only > $filename # LOCAL IP ADRESS
+		IP=`cat $filename`
+		echo "Client Ip : $IP"
+		echo "$IP" > $IP_temp
+		ncat -l -p $PORT -e $id_sh ## Identification Nathan 
+		## ON IDENTIFIE L'IP ET ON ENVOIE SI L'ID S'EST BIEN DEROULE OU PAS
+		for i in `cat $HOSTS`;do
+			if [ "$i" == "$IP" ];then
+				line=`cat $HOSTS | tail -1`
+				IFS=" " read -a array <<< "$line"
+				user=${array[1]} # ON recupere le deuxieme : user
+				echo "OK $user" |ncat -l -p $PORTID --send-only # Si il y a l'IP dans HOSTS ALORS OK
+				ID_done="OK"
+			fi			
+		done
+		if [ "$ID_done" != "OK" ];then
+			echo "NO"|ncat -l -p $PORTID --send-only # Sinon --> NO
+		fi	
+		sleep 0.5
+	done
+}
+function SEND()
+{
+	for i in `cat $IP_allowed`;do
+		echo "$msg_to_send" |ncat -l -p $PORT_SEND --send-only #--allowfile $IP_allowed 
+	done
+
+}
+function RECV()
+{
+	while [ 1 -eq 1 ];
+	do
+		ncat -l -p $PORT_RECV --recv-only > $recv
+		msg=`cat $recv`
+
+		IFS=" " read -a local msg_array <<< "$msg"
+
+		if [ "$msg" != "" ];then # Si non vide
+			echo -e "Recu : $msg" # SI EXIT --> on supprime de hosts.txt
+
+			if [ "${msg_array[1]}" = "exit" ];then
+					echo "User : ${msg_array[0]} is disconnected"
+			fi
+			else		
+				msg_to_send=$msg
+				SEND 
+			fi
+		fi
+
+	done
+}
+
+function main()
+{
+	clean ## On clean les hosts de la session precedente
+	touch $HOSTS
+	touch $IP_allowed
+	clear
+	echo "Server opened at :  $IP:$PORT"
+
+	ID &
+	pid1=$!
+
+	local nb_lignes=`cat $HOSTS |wc -l` # On bloque jusqu"a qu'il y ait le 1er client
+	echo "NB lignes : $nb_lignes"
+	while [ "$nb_lignes" != "1" ];do
+		nb_lignes=`cat $HOSTS| wc -l`
+	done
+	
+
+	RECV &
+	pid2=$!
+
+	trap '{ echo "[!] Ctrl-c pressed closing threads $pid1 $pid2 and cleaning up .."; kill $pid1;kill $pid2; echo "Done";clean; exit 1;}' INT
+
+
+	while [ 1 -eq 1 ];do
+		clear
+		echo -e "Hotes connectées :\n`cat $HOSTS`"
+		sleep 3
+	done	
+
+	wait $pid1 && echo "pid1 exited normally" || echo "pid1 exited abnormally with status $?"
+	wait $pid2 && echo "pid2 exited normally" || echo "pid2 exited abnormally with status $?"
+
+}
+
+main
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#function SEND()
+##{
+#	msg=""
+#	while [ 1 -eq 1 ];
+#	do
+#		echo "$msg" | ncat -k -l -p $PORT --send-only 
+#	done	
+##}
+
+#RECV 1 &
+#pid1=$!
+
+
+
+# UTILISER PLUSIEURS PORT POUR PLUSIEURS TACHES
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#wait $pid1 && echo "pid1 exited normally" || echo "pid1 exited abnormally with status $?"
+
+#wait # On attend que les threads finissent
+
+#ncat -k -l 1234 
+
+# UN NCAT POUR ENVOYER ET UN AUTRE POUR RECEVOIR
+
+#connection
+#mkfifo backpipe
+#nc -k -l 12345 < backpipe | cat 1> backpipe
+
+
+#ncat --keep-open --listen -p $PORT | send_all
+
+#connection | ncat --keep-open --listen -p $PORT 
+#ncat -l --chat -p $PORT
+##./server.sh | `nc -l -p $PORT` 
+#  -c, --sh-exec <command>    Executes the given command via /bin/sh
+#  -e, --exec <command>       Executes the given command
+# https://www.systutorials.com/docs/linux/man/1-ncat/
+#https://doc.fedora-fr.org/wiki/Netcat,_connexion_client/serveur_en_bash
