@@ -51,15 +51,27 @@ function ID()
 		if [ "$ID_done" != "OK" ];then
 			echo "NO"|ncat -l -p $PORTID --send-only # Sinon --> NO
 		fi	
-		sleep 0.2
+		echo "server There are actually `cat $HOSTS |wc -l` clients connected"|ncat -l -p $PORT_SEND --send-only
+		sleep 0.1
 	done
 }
 function SEND()
 {
-	#for i in `cat $IP_allowed`;do
-	echo "$msg_to_send" |ncat -k -l -p $PORT_SEND --send-only #--allowfile $IP_allowed 
-	#done
+	for i in `cat $IP_allowed`;do
+		echo "$msg_to_send" |ncat -l -p $PORT_SEND --send-only #--allowfile $IP_allowed 
+	done
 
+}
+
+function remove_client()
+{
+	echo "User : $1 is disconnected"
+	echo "Removing client ..."
+	sed '/$1/d' "$HOSTS" > "$HOSTS"
+	echo "Done"
+	msg_to_send="server $1 is disconnected"
+	SEND &
+	
 }
 function RECV()
 {
@@ -72,6 +84,7 @@ function RECV()
 
 		if [ "$msg" != "" ];then # Si non vide
 			echo -e "Recu : $msg" # SI EXIT --> on supprime de hosts.txt
+			echo -e "[1] : ${msg_array[1]}"
 			if [ "${msg_array[1]}" = "exit" ];then
 				msg_remove=$msg
 				remove_client ${msg_array[0]}
@@ -83,13 +96,6 @@ function RECV()
 		sleep 0.1
 
 	done
-}
-function remove_client()
-{
-	msg_to_send="server User $1 is disconnected"
-	SEND
-	echo "User : $1 is disconnected"
-	echo "Removing client ..."
 }
 
 function main()

@@ -32,7 +32,7 @@ function ID()
 	fi		
 
 	echo "IP_allowed : `cat $IP_allowed`"	# ID OK 
-	echo "$IP $user $passwd" >> $HOSTS
+	echo "$IP $user" >> $HOSTS
 }
 
 ID
