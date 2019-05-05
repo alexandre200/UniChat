@@ -26,12 +26,14 @@ function ID()
 	#	Si --> on accepte cet IP
 	#
 	IP=`cat $IP_temp`
-	local last_ip=`tail -n 1 $IP_allowed`
-	if [ "$IP" != "$last_ip" ];then # IF IT'S NOT THE SAME IP THEN ADD IT 
-		echo "$IP" >> $IP_allowed
-	fi		
 
-	echo "IP_allowed : `cat $IP_allowed`"	# ID OK 
+
+	#local last_ip=`tail -n 1 $IP_allowed`
+	#if [ "$IP" != "$last_ip" ];then # IF IT'S NOT THE SAME IP THEN ADD IT 
+	#	echo "$IP" >> $IP_allowed
+	#fi		
+	echo $IP >> $IP_allowed
+	#echo "IP_allowed : `cat $IP_allowed`"	# ID OK 
 	echo "$IP $user" >> $HOSTS
 }
 

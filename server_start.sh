@@ -46,33 +46,56 @@ function ID()
 				user=${array[1]} # ON recupere le deuxieme : user
 				echo "OK $user" |ncat -l -p $PORTID --send-only # Si il y a l'IP dans HOSTS ALORS OK
 				ID_done="OK"
+				sleep 0.5
+				msg_to_send="server There are actually `cat $HOSTS |wc -l` clients connected"
+				SEND
+				msg_to_send="server $user has joined the channel"
+				SEND
 			fi			
 		done
 		if [ "$ID_done" != "OK" ];then
 			echo "NO"|ncat -l -p $PORTID --send-only # Sinon --> NO
 		fi	
 		sleep 0.1
-		echo "server There are actually `cat $HOSTS |wc -l` clients connected"|ncat -l -p $PORT_SEND --send-only
 	done
 }
 function SEND()
 {
-	
-	echo "$msg_to_send" |ncat -l -k -p $PORT_SEND -w 1 --send-only #--allowfile $IP_allowed 
-
+	for cl in `cat $IP_allowed`;do		
+		echo "$msg_to_send" |ncat -l -p $PORT_SEND -w 1 --send-only --allow $cl #--allowfile $IP_allowed 
+	done
 }
 
 function remove_client()
 {
+	local host_temp="tmp.txt"	
 	echo "User : $1 is disconnected"
 	echo "Removing client ..."
-	#sed "/$1/d" "$HOSTS" > "$HOSTS"
+
+#	if [ `cat $HOSTS |wc -l` = "1" ];then
+#		rm $HOSTS
+#		touch $HOSTS
+#	else	
+#		sed /$1/'d' "$HOSTS" > "$host_temp"
+#		`cat $host_temp` > "$HOSTS"
+#		rm $host_temp
+#		IFS=" " read -a host_array <<< `cat $HOSTS`
+#		for info in ${!host_array[@]};do
+#			if [ $info = $user ];then
+#				let "line=info/2"
+#				echo "Line : $line"
+#				sed $line'd' $IP_allowed > $host_temp
+#				`cat $host_temp` > $IP_allowed
+#				rm $host_temp
+#				echo "Done IP IP_allowed" 
+#			fi
+#		done		
+#	fi
+
+
 	echo "Done"
 	msg_to_send="server $1 is disconnected"
-	{
-		echo "$msg_to_send" |ncat -l -k -p $PORT_SEND -w 1 --send-only #--allowfile $IP_allowed 
-	}&
-	
+	SEND&	
 }
 function RECV()
 {
@@ -124,7 +147,7 @@ function main()
 
 
 	while [ 1 -eq 1 ];do
-		clear
+		#clear
 		echo -e "Hotes connectées :\n`cat $HOSTS`"
 		sleep 3
 	done	
