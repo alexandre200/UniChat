@@ -1,11 +1,11 @@
 #!/bin/bash
 #IP="127.0.0.1"
 IP="192.168.0.44"
-let PORTID=1233
-let PORT=1234
-let PORT2=1235
-let PORT_RECV=1236
-let PORT_SEND=1237
+let "PORTID=1233"
+let "PORT=1234"
+let "PORT2=1235"
+let "PORT_RECV=1236"
+let "PORT_SEND=1237"
 
 id_sh="id.sh"
 msg_to_send=""
@@ -51,15 +51,14 @@ function ID()
 		if [ "$ID_done" != "OK" ];then
 			echo "NO"|ncat -l -p $PORTID --send-only # Sinon --> NO
 		fi	
-		echo "server There are actually `cat $HOSTS |wc -l` clients connected"|ncat -l -p $PORT_SEND --send-only
 		sleep 0.1
+		echo "server There are actually `cat $HOSTS |wc -l` clients connected"|ncat -l -p $PORT_SEND --send-only
 	done
 }
 function SEND()
 {
-	for i in `cat $IP_allowed`;do
-		echo "$msg_to_send" |ncat -l -p $PORT_SEND --send-only #--allowfile $IP_allowed 
-	done
+	
+	echo "$msg_to_send" |ncat -l -k -p $PORT_SEND -w 1 --send-only #--allowfile $IP_allowed 
 
 }
 
@@ -67,10 +66,12 @@ function remove_client()
 {
 	echo "User : $1 is disconnected"
 	echo "Removing client ..."
-	sed '/$1/d' "$HOSTS" > "$HOSTS"
+	#sed "/$1/d" "$HOSTS" > "$HOSTS"
 	echo "Done"
 	msg_to_send="server $1 is disconnected"
-	SEND &
+	{
+		echo "$msg_to_send" |ncat -l -k -p $PORT_SEND -w 1 --send-only #--allowfile $IP_allowed 
+	}&
 	
 }
 function RECV()
@@ -116,7 +117,6 @@ function main()
 		sleep 0.1
 	done
 	
-
 	RECV &
 	pid2=$!
 

@@ -64,7 +64,6 @@ function ID()
 	if [ "$msg" == "OK" ];then
 		let "id=1"
 	fi	
-	sleep 3
 
 }
 
@@ -101,8 +100,9 @@ function compare()
 	#echo "[$user_c] $msg"
 }
 function recv_server()
-{
+{	
 	while [ "$input" != "exit" ];do
+
 		ncat --recv-only $IP $PORT_RECV > $recv_serv 2>/dev/null
 		msg=`cat $recv_serv`
 		if [ "$msg" != "" ];then
