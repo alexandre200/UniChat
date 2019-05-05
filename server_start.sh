@@ -15,6 +15,7 @@ IP_allowed="ip_allowed.txt"
 HOSTS="hosts.txt"
 recv="recv_all.txt"
 let "JUST_ONE=0"
+msg_remove=""
 
 function clean() # On nettoie les fichiers temporaire à chaque redemarrages
 {
@@ -50,14 +51,14 @@ function ID()
 		if [ "$ID_done" != "OK" ];then
 			echo "NO"|ncat -l -p $PORTID --send-only # Sinon --> NO
 		fi	
-		sleep 0.5
+		sleep 0.2
 	done
 }
 function SEND()
 {
-	for i in `cat $IP_allowed`;do
-		echo "$msg_to_send" |ncat -l -p $PORT_SEND --send-only #--allowfile $IP_allowed 
-	done
+	#for i in `cat $IP_allowed`;do
+	echo "$msg_to_send" |ncat -k -l -p $PORT_SEND --send-only #--allowfile $IP_allowed 
+	#done
 
 }
 function RECV()
@@ -67,21 +68,28 @@ function RECV()
 		ncat -l -p $PORT_RECV --recv-only > $recv
 		msg=`cat $recv`
 
-		IFS=" " read -a local msg_array <<< "$msg"
+		IFS=" " read -a msg_array <<< "$msg"
 
 		if [ "$msg" != "" ];then # Si non vide
 			echo -e "Recu : $msg" # SI EXIT --> on supprime de hosts.txt
-
 			if [ "${msg_array[1]}" = "exit" ];then
-					echo "User : ${msg_array[0]} is disconnected"
-			fi
+				msg_remove=$msg
+				remove_client ${msg_array[0]}
 			else		
 				msg_to_send=$msg
 				SEND 
 			fi
 		fi
+		sleep 0.1
 
 	done
+}
+function remove_client()
+{
+	msg_to_send="server User $1 is disconnected"
+	SEND
+	echo "User : $1 is disconnected"
+	echo "Removing client ..."
 }
 
 function main()
@@ -94,11 +102,12 @@ function main()
 
 	ID &
 	pid1=$!
-
+	sleep 0.5
 	local nb_lignes=`cat $HOSTS |wc -l` # On bloque jusqu"a qu'il y ait le 1er client
-	echo "NB lignes : $nb_lignes"
+
 	while [ "$nb_lignes" != "1" ];do
 		nb_lignes=`cat $HOSTS| wc -l`
+		sleep 0.1
 	done
 	
 

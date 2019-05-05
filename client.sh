@@ -9,6 +9,12 @@ let PORT_SEND=1236
 let PORT_RECV=1237
 let "id=0"
 
+RED='\033[0;31m'
+GRN='\033[0;32m'
+YLW='\033[1;33m'
+NC='\033[0m' # No Color
+
+msg_to_send=""
 user=""
 input=""
 msg=""
@@ -23,6 +29,23 @@ function clean()
 	rm $recv_serv
 	rm $filename
 }
+function print_status()
+{
+	echo -e "${YLW}[*] $msg_to_send${NC}"
+}
+function print_done()
+{
+	echo -e "${GRN}[*] $msg_to_send${NC}"
+}
+function print_error()
+{
+	echo -e "${RED}[X] $msg_to_send${NC}"
+}
+function print_warning()
+{
+	echo -e '${YLW}[!] $msg_to_send${NC}'
+}
+
 function ID()
 {
 	echo "|*] Sending IP"
@@ -33,7 +56,7 @@ function ID()
 	sleep 0.5
 	ncat --recv-only $IP $PORTID > $filename # ID marché ou pas ?
 	msg=`cat $filename`
-	echo "msg : $msg"
+	#echo "msg : $msg"
 	IFS=" " read -a array <<< "$msg"
 	msg=${array[0]} # ON recupere le premier element 
 	user=${array[1]} # ON recupere le deuxieme : user
@@ -48,8 +71,11 @@ function ID()
 function send_server()
 {
 	local send=""
+	msg_to_send="You have now acces to the chat !\nYou can stop by pressing Ctrl-c or by taping exit"
+	print_done
 	while [ 1 -eq 1 ];do
-		echo -e ">> \c"
+		#echo -e ">> \c"
+		sleep 0.1
 		read input
 		send=$user" "$input
 		if [ "$input" = "exit" ];then
@@ -63,22 +89,44 @@ function send_server()
 	done
 }
 
+function compare()
+{
+	local user_c=$1
+	
+	if [ "$user_c" = "server" ];then
+		echo -e "${GRN}[$user_c]${NC} $msg"
+	elif [ "$user_c" != "$user" ];then	
+		echo -e "${YLW}[$user_c]${NC} $msg"
+	fi		
+	#echo "[$user_c] $msg"
+}
 function recv_server()
 {
 	while [ "$input" != "exit" ];do
 		ncat --recv-only $IP $PORT_RECV > $recv_serv 2>/dev/null
 		msg=`cat $recv_serv`
 		if [ "$msg" != "" ];then
-			echo "$msg"
+			IFS=" " read -a msg_recv <<< "$msg"
+			local user_recv=${msg_recv[0]}
+			unset msg_recv[0]
+			msg=""
+			for str in "${!msg_recv[@]}";do
+				msg=$msg${msg_recv[$str]}" "
+			done
+			compare	$user_recv
+			#echo "[$user_recv] $msg"
 		fi	
 	done
 }
+
 function connection()
 {
-	echo "Starting recv thread and send thread ...."
+	echo "[!] Starting recv thread and send thread ...."
 	recv_server &
 	pid1=$!
-	trap '{ echo "[!] Ctrl-c pressed, closing threads $pid1 and cleanning up .."; kill $pid1;echo "[*] Done";clean; exit 1;}' INT
+	trap '{ ctrl_c; exit 1;}' INT
+	echo "[*] Done"
+	sleep 0.5
 	send_server 
 
 	wait $pid1 && echo "pid1 exited normally" || echo "pid1 exited abnormally with status $?"
@@ -95,6 +143,14 @@ function main()
 		echo "ID OK, now launching the chat ..."
 		connection
 	fi
+}
+function ctrl_c()
+{
+	echo "[!] Ctrl-c pressed, closing threads $pid1 and cleanning up .."
+	kill $pid1
+	clean
+	echo "$user exit" |ncat --send-only $IP $PORT_SEND 
+	echo "[*] Done"
 }
 
 main
