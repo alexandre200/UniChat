@@ -1,13 +1,15 @@
 #!/bin/bash
 #IP="127.0.0.1"
 IP="192.168.0.44"
-let "PORTID=1233"
+
+let "PORTID=1238"
 let "PORT=1234"
 let "PORT2=1235"
 let "PORT_RECV=1236"
 let "PORT_SEND=1237"
 
-id_sh="id.sh"
+id_sh="nathan_id.sh"
+#id_sh="id.sh"
 msg_to_send=""
 filename="recv.txt"
 IP_temp="cl_ip.txt"
@@ -63,7 +65,7 @@ function SEND()
 {
 	for cl in `cat $IP_allowed`;do	
 		echo "Send : $cl"	
-		echo "$msg_to_send" |ncat -l -p $PORT_SEND -w 1 --send-only #--allowfile $IP_allowed 
+		echo "$msg_to_send" |ncat -l -p $PORT_SEND -w 1 --send-only --allow $cl #--allowfile $IP_allowed # --allow $cl ---> On evite d'envoie aleatoirement 
 	done
 }
 

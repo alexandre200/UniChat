@@ -1,8 +1,9 @@
 user="Hugo"
 
 #IP="127.0.0.1"
-IP="192.168.0.44"
-let PORTID=1233
+#IP="192.168.43.94"
+IP="127.0.0.1"
+let PORTID=1238
 let PORT=1234
 let PORT2=1235
 let PORT_SEND=1236
@@ -22,7 +23,9 @@ filename="recv_client.txt"
 recv_serv="recv_server.txt"
 interface="wlp2s0"
 #interface="eth0"
-MY_IP=`ifconfig $interface | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
+#MY_IP=`ifconfig $interface | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
+
+MY_IP="127.0.0.1"
 
 function clean()
 {
@@ -137,6 +140,11 @@ function main()
 {
 	echo "[*] My IP : $MY_IP, interface: $interface"
 	echo "[!] If the connection is not working, the server might be down"
+	echo "[!] Your ports $PORT $PORT2 $PORTID $PORT_SEND $PORT_RECV must be openned"
+	if [ "$MY_IP" = "" ];then
+		echo "[X] Error your ip is unknown ..."
+		echo "Quitting ..."
+	fi	
 	ID
 	sleep 0.5
 	if [ $id -eq 1 ];then
