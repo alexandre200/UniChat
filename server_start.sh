@@ -61,8 +61,9 @@ function ID()
 }
 function SEND()
 {
-	for cl in `cat $IP_allowed`;do		
-		echo "$msg_to_send" |ncat -l -p $PORT_SEND -w 1 --send-only --allow $cl #--allowfile $IP_allowed 
+	for cl in `cat $IP_allowed`;do	
+		echo "Send : $cl"	
+		echo "$msg_to_send" |ncat -l -p $PORT_SEND -w 1 --send-only #--allowfile $IP_allowed 
 	done
 }
 

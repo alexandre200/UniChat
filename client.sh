@@ -75,7 +75,7 @@ function send_server()
 	while [ 1 -eq 1 ];do
 		#echo -e ">> \c"
 		sleep 0.1
-		read input
+		read input # read -s --> don't display what you tape
 		send=$user" "$input
 		if [ "$input" = "exit" ];then
 			echo "[!] Exiting .. "
