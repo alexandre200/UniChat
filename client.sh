@@ -1,13 +1,13 @@
-user="Hugo"
 
 #IP="127.0.0.1"
 #IP="192.168.43.94"
 IP="127.0.0.1"
-let PORTID=1238
 let PORT=1234
 let PORT2=1235
 let PORT_SEND=1236
 let PORT_RECV=1237
+let PORTID=1238
+
 let "id=0"
 
 RED='\033[0;31m'
@@ -104,20 +104,25 @@ function compare()
 }
 function recv_server()
 {	
+	local msg_=""
+	local old_msg=""
 	while [ "$input" != "exit" ];do
 
 		ncat --recv-only $IP $PORT_RECV > $recv_serv 2>/dev/null
+		old_msg=$msg_
 		msg=`cat $recv_serv`
+		msg_=$msg
 		if [ "$msg" != "" ];then
 			IFS=" " read -a msg_recv <<< "$msg"
 			local user_recv=${msg_recv[0]}
 			unset msg_recv[0]
-			msg=""
-			for str in "${!msg_recv[@]}";do
-				msg=$msg${msg_recv[$str]}" "
-			done
-			compare	$user_recv
-			#echo "[$user_recv] $msg"
+			if [ "$msg_" != "$old_msg" ];then
+				msg=""
+				for str in "${!msg_recv[@]}";do
+					msg=$msg${msg_recv[$str]}" "
+				done
+				compare	$user_recv
+			fi #echo "[$user_recv] $msg"
 		fi	
 	done
 }
@@ -129,7 +134,7 @@ function connection()
 	pid1=$!
 	trap '{ ctrl_c; exit 1;}' INT
 	echo "[*] Done"
-	sleep 0.5
+#	sleep 0.5
 	send_server 
 
 	wait $pid1 && echo "pid1 exited normally" || echo "pid1 exited abnormally with status $?"
@@ -146,10 +151,11 @@ function main()
 		echo "Quitting ..."
 	fi	
 	ID
-	sleep 0.5
 	if [ $id -eq 1 ];then
 		echo "ID OK, now launching the chat ..."
 		connection
+	else
+		echo "[X] ID not worked"	
 	fi
 }
 function ctrl_c()

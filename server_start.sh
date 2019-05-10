@@ -2,12 +2,13 @@
 #IP="127.0.0.1"
 IP="192.168.0.44"
 
-let "PORTID=1238"
 let "PORT=1234"
 let "PORT2=1235"
 let "PORT_RECV=1236"
 let "PORT_SEND=1237"
+let "PORTID=1238"
 
+########################### Faire tableau de clients connectés
 id_sh="nathan_id.sh"
 #id_sh="id.sh"
 msg_to_send=""
@@ -34,15 +35,16 @@ function ID()
 	local ID_done=""
 	local IP=""
 	while [ 1 -eq 1 ];do
-
+		echo "ID Running"
 		ncat -l -p $PORT --recv-only > $filename # LOCAL IP ADRESS
 		IP=`cat $filename`
 		echo "Client Ip : $IP"
 		echo "$IP" > $IP_temp
 		ncat -l -p $PORT -e $id_sh ## Identification Nathan 
-		## ON IDENTIFIE L'IP ET ON ENVOIE SI L'ID S'EST BIEN DEROULE OU PAS
+		## ON IDENTIFIE L'IP ET ON ENVOIE SI L'ID S'EST BIEN DEROULE OU PAS # ERROR AU 3EME CLIENT
 		for i in `cat $HOSTS`;do
 			if [ "$i" == "$IP" ];then
+				echo "User logged in host.txt"
 				line=`cat $HOSTS | tail -1`
 				IFS=" " read -a array <<< "$line"
 				user=${array[1]} # ON recupere le deuxieme : user
@@ -105,6 +107,7 @@ function RECV()
 	while [ 1 -eq 1 ];
 	do
 		ncat -l -p $PORT_RECV --recv-only > $recv
+
 		msg=`cat $recv`
 
 		IFS=" " read -a msg_array <<< "$msg"
@@ -135,13 +138,7 @@ function main()
 
 	ID &
 	pid1=$!
-	sleep 0.5
-	local nb_lignes=`cat $HOSTS |wc -l` # On bloque jusqu"a qu'il y ait le 1er client
 
-	while [ "$nb_lignes" != "1" ];do
-		nb_lignes=`cat $HOSTS| wc -l`
-		sleep 0.1
-	done
 	
 	RECV &
 	pid2=$!
