@@ -1,5 +1,4 @@
 #!/bin/bash
-#IP="127.0.0.1"
 IP="192.168.0.44"
 
 let "PORT=1234"
@@ -10,14 +9,12 @@ let "PORTID=1238"
 
 ########################### Faire tableau de clients connectés
 id_sh="nathan_id.sh"
-#id_sh="id.sh"
 msg_to_send=""
 filename="recv.txt"
 IP_temp="cl_ip.txt"
 IP_allowed="ip_allowed.txt"
 HOSTS="hosts.txt"
 recv="recv_all.txt"
-let "JUST_ONE=0"
 msg_remove=""
 
 function clean() # On nettoie les fichiers temporaire à chaque redemarrages
@@ -192,22 +189,6 @@ main
 
 
 
-
-#function SEND()
-##{
-#	msg=""
-#	while [ 1 -eq 1 ];
-#	do
-#		echo "$msg" | ncat -k -l -p $PORT --send-only 
-#	done	
-##}
-
-#RECV 1 &
-#pid1=$!
-
-
-
-# UTILISER PLUSIEURS PORT POUR PLUSIEURS TACHES
 
 
 
