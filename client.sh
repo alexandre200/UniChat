@@ -1,7 +1,10 @@
+#!/bin/bash
 
-#IP="127.0.0.1"
-#IP="192.168.43.94"
+# IP SERVER
 IP="127.0.0.1"
+# IP CLIENT
+MY_IP="127.0.0.1"
+
 let PORT=1234
 let PORT2=1235
 let PORT_SEND=1236
@@ -25,7 +28,6 @@ interface="wlp2s0"
 #interface="eth0"
 #MY_IP=`ifconfig $interface | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
 
-MY_IP="127.0.0.1"
 
 function clean()
 {
@@ -73,7 +75,7 @@ function ID()
 function send_server()
 {
 	local send=""
-	msg_to_send="You have now acces to the chat !\nYou can stop by pressing Ctrl-c or by taping exit"
+	msg_to_send="You have now acces to the chat !\n[*]You can stop by pressing Ctrl-c or by taping exit"
 	print_done
 	while [ 1 -eq 1 ];do
 		#echo -e ">> \c"
