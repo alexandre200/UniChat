@@ -77,13 +77,17 @@ function remove_client()
 	echo "User : $1 is disconnected"
 	echo "Removing client ..."
 
-#	if [ `cat $HOSTS |wc -l` = "1" ];then
-#		rm $HOSTS
-#		touch $HOSTS
-#	else	
-#		sed /$1/'d' "$HOSTS" > "$host_temp"
-#		`cat $host_temp` > "$HOSTS"
-#		rm $host_temp
+	if [ `cat $HOSTS |wc -l` = "1" ];then
+		echo "Just one client was connected ..."
+		rm $HOSTS
+		touch $HOSTS
+		echo "Done"
+	else
+		echo "Removing $1 ..."	
+		sed /$1/'d' $HOSTS > $host_temp
+		cat $host_temp > $HOSTS
+		rm $host_temp
+
 #		IFS=" " read -a host_array <<< `cat $HOSTS`
 #		for info in ${!host_array[@]};do
 #			if [ $info = $user ];then
@@ -95,7 +99,7 @@ function remove_client()
 #				echo "Done IP IP_allowed" 
 #			fi
 #		done		
-#	fi
+	fi
 
 
 	echo "Done"
