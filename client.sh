@@ -7,7 +7,7 @@ let PORT2=1235
 let PORT_SEND=1236
 let PORT_RECV=1237
 let PORTID=1238
-
+PORTCL=""
 let "id=0"
 
 RED='\033[0;31m'
@@ -63,7 +63,7 @@ function ID()
 	IFS=" " read -a array <<< "$msg"
 	msg=${array[0]} # ON recupere le premier element 
 	user=${array[1]} # ON recupere le deuxieme : user
-
+	PORTCL=${array[2]}
 	if [ "$msg" == "OK" ];then
 		let "id=1"
 	fi	
@@ -84,10 +84,10 @@ function send_server()
 			echo "[!] Exiting .. "
 			clean
 			kill $pid1
-			echo $send | ncat --send-only $IP $PORT_SEND 
+			echo $send | ncat --send-only $IP $PORT_SEND
 			break
 		fi	
-		echo $send | ncat --send-only $IP $PORT_SEND 
+		echo $send | ncat --send-only $IP $PORT_SEND
 	done
 }
 
@@ -108,7 +108,7 @@ function recv_server()
 	local old_msg=""
 	while [ "$input" != "exit" ];do
 
-		ncat --recv-only $IP $PORT_RECV > $recv_serv 2>/dev/null
+		ncat --recv-only $IP $PORTCL > $recv_serv 2>/dev/null
 		old_msg=$msg_
 		msg=`cat $recv_serv`
 		msg_=$msg

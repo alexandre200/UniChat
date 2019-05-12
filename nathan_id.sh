@@ -21,6 +21,8 @@ read_identifiant=""
 read_motdepasse=""
 pwd_db="pwd.db"
 
+all_port="all_port.txt"
+file_clport="cl_port.txt"
 HOSTS="hosts.txt"
 IP_temp="cl_ip.txt"
 IP_allowed="ip_allowed.txt"
@@ -209,18 +211,24 @@ then
 		then
 			let connected=1
 			echo "Connected!" ############### POint d'entré
-
+			
 			IP=`cat $IP_temp`
-			echo "IP : $IP"
+			#echo "IP : $IP"
 
 			#local last_ip=`tail -n 1 $IP_allowed`
 			#if [ "$IP" != "$last_ip" ];then # IF IT'S NOT THE SAME IP THEN ADD IT 
 			#	echo "$IP" >> $IP_allowed
-			#fi		
+			#fi
+
 			echo $IP >> $IP_allowed
 			#echo "IP_allowed : `cat $IP_allowed`"	# ID OK 
-			echo "$IP $read_identifiant" >> $HOSTS
-			echo "Hosts : `cat $HOSTS`"
+			current_port=`cat $file_clport`
+			echo $current_port >> $all_port
+			echo "Port : $current_port"
+			
+			echo "$IP $read_identifiant $current_port" >> $HOSTS
+			#echo "Hosts : `cat $HOSTS`"
+			#echo "$current_port" >> $all_port
 
 		else
 			echo "Username or password incorrect."

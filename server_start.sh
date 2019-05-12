@@ -1,13 +1,16 @@
 #!/bin/bash
-IP="192.168.0.44"
+IP="192.168.1.50"
 
 let "PORT=1234"
 let "PORT2=1235"
 let "PORT_RECV=1236"
 let "PORT_SEND=1237"
 let "PORTID=1238"
+let "PORTCL=1239"
 
 ########################### Faire tableau de clients connectés
+all_port="all_port.txt"
+file_clport="cl_port.txt"
 id_sh="nathan_id.sh"
 msg_to_send=""
 filename="recv.txt"
@@ -24,6 +27,8 @@ function clean() # On nettoie les fichiers temporaire à chaque redemarrages
 	rm $filename
 	rm $IP_temp
 	rm $recv
+	rm $file_clport
+	rm $all_port
 }
 
 function ID()
@@ -33,6 +38,8 @@ function ID()
 	local IP=""
 	while [ 1 -eq 1 ];do
 		echo "ID Running"
+		echo "$PORTCL" > $file_clport
+
 		ncat -l -p $PORT --recv-only > $filename # LOCAL IP ADRESS
 		IP=`cat $filename`
 		echo "Client Ip : $IP"
@@ -40,12 +47,14 @@ function ID()
 		ncat -l -p $PORT -e $id_sh ## Identification Nathan 
 		## ON IDENTIFIE L'IP ET ON ENVOIE SI L'ID S'EST BIEN DEROULE OU PAS # ERROR AU 3EME CLIENT
 		for i in `cat $HOSTS`;do
-			if [ "$i" == "$IP" ];then
+			if [ "$i" = "$IP" ];then
 				echo "User logged in host.txt"
 				line=`cat $HOSTS | tail -1`
 				IFS=" " read -a array <<< "$line"
 				user=${array[1]} # ON recupere le deuxieme : user
-				echo "OK $user" |ncat -l -p $PORTID --send-only # Si il y a l'IP dans HOSTS ALORS OK
+				echo "OK $user $PORTCL" |ncat -l -p $PORTID --send-only # Si il y a l'IP dans HOSTS ALORS OK
+				let "PORTCL=$PORTCL+1"
+
 				ID_done="OK"
 				sleep 0.5
 				msg_to_send="server There are actually `cat $HOSTS |wc -l` clients connected"
@@ -62,10 +71,14 @@ function ID()
 }
 function SEND()
 {
-	for cl in `cat $IP_allowed`;do	
-		echo "Send : $cl"	
-		echo "$msg_to_send" |ncat -l -p $PORT_SEND -w 1 --send-only --allow $cl #--allowfile $IP_allowed # --allow $cl ---> On evite d'envoie aleatoirement 
-	done
+	for port in `cat $all_port`;do
+		echo "Send with : $port"
+		echo "$msg_to_send" |ncat -l -p $port -w 1
+	done	
+#	for cl in `cat $IP_allowed`;do	
+#		echo "Send : $cl"	
+#		echo "$msg_to_send" |ncat -l -p $PORT_SEND -w 1 --send-only #--allow $cl #--allowfile $IP_allowed # --allow $cl ---> On evite d'envoie aleatoirement 
+#	done
 }
 
 function remove_client()
