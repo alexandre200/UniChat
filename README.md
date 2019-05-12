@@ -11,13 +11,18 @@ This project is only working on locals ip
 These instructions will get you a copy of the project up and running on your local machine.
 
 ### Prerequisites
-You need to install the netcat package
+You need to install the netcat package.
 Exemple in ubuntu deb : 
 ```
   sudo apt-get update
   sudo apt-get install build-essential netcat nc
 ```
 ### Setting up the project
+You can get your local ip adress by taping : 
+```
+ifconfig
+```
+And then choose the right one with the right interface (wlan0,eth0 ...)
 #### On Server : 
 You need to put the local IP of the server in the file [server_start.sh](https://github.com/Mathugo/UniChat/blob/master/server_start.sh)
 ```
