@@ -28,6 +28,9 @@ You need to put the local IP of the server in the file [server_start.sh](https:/
 ```
 #!/bin/bash
 #IP="SERVER_IP" ## You need to put here the server IP
+.
+.
+.
 ```
 #### On Clients : 
 You need to put the local IP of the client and the Server in the file [client.sh](https://github.com/Mathugo/UniChat/blob/master/client.sh)
@@ -35,6 +38,9 @@ You need to put the local IP of the client and the Server in the file [client.sh
 #!/bin/bash
 MY_IP="YOUR_IP"
 IP="SERVER_IP"
+.
+.
+.
 ```
 ## Authors
 * **Nathan Haudot**
