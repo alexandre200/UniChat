@@ -52,9 +52,9 @@ function ID()
 				ID_done="OK"
 				sleep 0.5
 				msg_to_send="server There are actually `cat $HOSTS |wc -l` clients connected"
-				SEND
+				SEND &
 				msg_to_send="server $user has joined the channel"
-				SEND
+				SEND &
 			fi			
 		done
 		if [ "$ID_done" != "OK" ];then
