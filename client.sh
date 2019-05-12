@@ -129,11 +129,11 @@ function recv_server()
 
 function connection()
 {
-	echo "[!] Starting recv thread and send thread ...."
+	#echo "[!] Starting recv thread and send thread ...."
 	recv_server &
 	pid1=$!
 	trap '{ ctrl_c; exit 1;}' INT
-	echo "[*] Done"
+	#echo "[*] Done"
 #	sleep 0.5
 	send_server 
 
@@ -152,7 +152,7 @@ function main()
 	fi	
 	ID
 	if [ $id -eq 1 ];then
-		echo "ID OK, now launching the chat ..."
+		#echo "ID OK, now launching the chat ..."
 		connection
 	else
 		echo "[X] ID not worked"	
