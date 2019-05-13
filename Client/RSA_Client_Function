@@ -1,0 +1,50 @@
+#!/bin/bash
+
+keygen()
+{
+let modulus=2048
+
+#detection des fichiers clientkey et clientpubkey.pem
+if [ -e "clientkey.pem" ]
+then
+	echo " "
+else
+
+	#création de paire de clés
+	openssl genrsa  -out clientkey.pem  $modulus
+
+	#extraction de la partie publique dans fichier clientpubkey.pem
+	openssl rsa -in clientkey.pem -pubout -out clientpubkey.pem
+
+	# deux fichiers, clientkey.pem et clientpubkey.pem
+fi
+}
+
+
+
+encrypt()
+{
+#création d'un fichier message.txt contenant le message a envoyer au serveur
+echo "$msg_to_send" >> message.txt
+
+#chiffrement du message avec serveurpubkey.pem
+openssl rsautl -encrypt -pubin -in message.txt -inkey serveurpubkey.pem  -out user_clientcryptmessage.txt
+
+#cat clientcryptmessage.txt
+#message crypté disponible dans user_clientcryptmessage.txt
+}
+
+
+decrypt()
+{
+#décryptage du message serveur "recv_serveur.txt" avec clientkey.pem
+#fichier decrypté "clearmessage.txt"
+openssl rsautl -decrypt -in recv_serveur.txt -inkey clientkey.pem  -out clearmessage.txt
+#cat clearmessage.txt
+}
+
+
+#msg_to_send="Message du client avec caractéres Spécîa°ux"
+#keygen
+#encrypt
+

@@ -1,0 +1,69 @@
+#!/bin/bash
+
+keygen()
+{
+
+
+	#detection of serveurkey.pem
+	if [ -e "serveurkey.pem" ]
+	then
+		echo " "
+	else
+
+		modulus=2048
+		#creating a pair of keys, private and public key
+		openssl genrsa  -out serveurkey.pem  $modulus
+
+		#extracting the public key from the prvate key
+		#into serveurpubkey.pem
+		openssl rsa -in serveurkey.pem -pubout -out serveurpubkey.pem
+	fi
+	#two keys available, serveurpubkey.pem and serveurkey.pem
+}
+
+decrypt()
+	{
+	#decrypting incoming messages from user with serveurkey.pem (private key)
+	openssl rsautl -decrypt -in recv_all.txt -inkey serveurkey.pem  -out clearmessage.txt
+	cat clearmessage.txt
+	#followingcommand for test purpose
+	#cat clearmessage.txt
+	#message dechiffré dans clearmessage.txt
+}
+
+
+encrypt()
+{
+OLDIFS="$IFS"
+IFS=" "
+#this function allow to send one message to all users using RSA encryption
+#creating file containing the message to send
+echo " $msg_to_send " > message.txt
+
+#crypting message with userpubkey.pem for each user connected
+#extracting usertag, and userpubkey (location) from "host.txt"
+
+#following to commands only for test purpose
+#index=`cat host.txt | wc -l `
+#echo "$index"
+
+while read ip user port keyfile
+do
+
+	echo "IP: $ip, user: $user, keyfile: $keyfile"
+
+	#concatenation from filename and it's extension
+	extension="_serveurcryptmessage.txt"
+	nomfichier="$user$extension"
+
+	#encryption from message.txt with each individual userpubkey.pem in user_serveurcryptmessage.txt
+	openssl rsautl -encrypt -pubin -in  message.txt -inkey $keyfile -out $nomfichier
+	echo "$nomfichier"
+done < host.txt
+
+}
+
+
+
+#keygen
+#decrypt
