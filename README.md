@@ -9,10 +9,10 @@ This project is only working on locals ip
 
 ## How it works
 ### Server :
-1 thread which allow to launch the identification in back and an loop to recv messages from all clients and to send it
+1 thread which allow to launch the identification in the back and an loop to receive messages from all clients and to send it
 Clients are stored in hosts.txt with : $IP $user $port $clientpubkey
 1 port is used per client because netcat cannot send a message to a specific client using the same port as the others.
-So, the client connect to the IP server and then the [nathan_id.sh](https://github.com/Mathugo/UniChat/blob/master/Server/nathan_id.sh) script is launched using the data base [pwd.db](ttps://github.com/Mathugo/UniChat/blob/master/Server/pwd.db) structured like : $key $user $mdp $clientpubkey. If it's successful the client can access to the chat, otherwise it exit. 
+So, the client connects to the IP server and then the [nathan_id.sh](https://github.com/Mathugo/UniChat/blob/master/Server/nathan_id.sh) script is launched using the data base [pwd.db](ttps://github.com/Mathugo/UniChat/blob/master/Server/pwd.db) structured like : $key $user $mdp $clientpubkey. If it's successful the client can access to the chat, otherwise it exits. 
 
 ### Client : 
 1 thread which recv message from the server at a specific port proper to the client and a loop to send message to the server.
