@@ -16,10 +16,10 @@ So, the client connects to the IP server and then the [nathan_id.sh](https://git
 
 ### Client : 
 1 thread which recv message from the server at a specific port proper to the client and a loop to send message to the server.
-The client send his IP and try to log in, if it's successful then he access to the chat.
+The client sends his IP and try to log in, if it's successful then he access to the chat.
 
 ### Encryption :
-First of all, the message are fully encrypted using RSA. At first the server send his publicKey to a client who is trying to connect and then the client encrypt his publickey using the serverpublickey and send it to the server which decrypt it and add it to the hosts.txt. After that, when a client is trying to send a message to the server, it's encrypted using his publickey. The server receives the encrypted message and decrypt it, then for all clients the server encrypt the message using special publickey (one per client) and send it to the clients. 
+First of all, the messages are fully encrypted using RSA. The server send his publicKey to a client who is trying to connect and then the client encrypts his publickey using the serverpublickey and send it to the server which decrypt it and add it to the hosts.txt. After that, when a client is trying to send a message to the server, it's encrypted using his publickey. The server receives the encrypted message and decrypt it, then for all clients the server encrypt the message using special publickey (one per client) and send it to the clients. 
 
 ## Getting started
 These instructions will get you a copy of the project up and running on your local machine.
