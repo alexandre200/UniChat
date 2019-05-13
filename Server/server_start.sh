@@ -45,7 +45,7 @@ function ID()
 		echo "Client Ip : $IP"
 		echo "$IP" > $IP_temp
 		ncat -l -p $PORT -e $id_sh ## Identification Nathan 
-		## ON IDENTIFIE L'IP ET ON ENVOIE SI L'ID S'EST BIEN DEROULE OU PAS # ERROR AU 3EME CLIENT
+		## ON IDENTIFIE L'IP ET ON ENVOIE SI L'ID S'EST BIEN DEROULE OU PAS
 		for i in `cat $HOSTS`;do
 			if [ "$i" = "$IP" ];then
 				echo "User logged in host.txt"
@@ -75,12 +75,6 @@ function SEND()
 		echo "Send with : $port"
 		echo "$msg_to_send" |ncat -l -p $port -w 1
 	done	
-#	for cl in `cat $IP_allowed`;do	
-#		echo "Send : $cl"	
-#		echo "$msg_to_send" |ncat -l -p $PORT_SEND -w 1 --send-only #--allow $cl #--allowfile $IP_allowed # --allow $cl ---> On evite d'envoie aleatoirement 
-#	done
-}
-
 function remove_client()
 {
 	local host_temp="tmp.txt"	
